@@ -1,0 +1,126 @@
+---
+globs: *.tsx,*.ts
+---
+
+# Security Guidelines
+
+## Input Sanitization
+
+- Sanitize all user inputs
+- Prevent XSS attacks
+- Validate data types
+
+```typescript
+import { sanitize } from "dompurify";
+
+function sanitizeInput(input: string): string {
+  return sanitize(input.trim());
+}
+
+function UserInput({ onSubmit }) {
+  const handleSubmit = (value: string) => {
+    onSubmit(sanitizeInput(value));
+  };
+
+  return <TextInput onSubmitEditing={handleSubmit} />;
+}
+```
+
+## Secure Storage
+
+- Use encrypted storage for sensitive data
+- Handle storage errors properly
+- Implement proper key management
+
+```typescript
+import * as SecureStore from "expo-secure-store";
+
+async function saveSecureItem(key: string, value: string) {
+  try {
+    await SecureStore.setItemAsync(key, value, {
+      requireAuthentication: true,
+      authenticationPrompt: "Please authenticate",
+    });
+  } catch (error) {
+    reportError(error);
+    throw new SecurityError("Failed to save secure item");
+  }
+}
+```
+
+## API Security
+
+- Use HTTPS for all API calls
+- Implement proper authentication
+- Handle tokens securely
+
+```typescript
+function createAuthenticatedFetch(token: string) {
+  return async (url: string, options: RequestInit = {}) => {
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        ...options.headers,
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.status === 401) {
+      // Handle token expiration
+      await refreshToken();
+    }
+
+    return response;
+  };
+}
+```
+
+## Permission Handling
+
+- Request minimum necessary permissions
+- Handle permission denials gracefully
+- Explain permission requests
+
+```typescript
+import * as Permissions from "expo-permissions";
+
+async function requestCameraPermission() {
+  const { status, canAskAgain } = await Permissions.getAsync(
+    Permissions.CAMERA
+  );
+
+  if (status === "granted") {
+    return true;
+  }
+
+  if (canAskAgain) {
+    const { status } = await Permissions.askAsync(Permissions.CAMERA);
+    return status === "granted";
+  }
+
+  return false;
+}
+```
+
+## Environment Variables
+
+- Use proper environment configuration
+- Keep sensitive data secure
+- Handle different environments
+
+```typescript
+import Constants from "expo-constants";
+
+const config = {
+  apiUrl: Constants.expoConfig?.extra?.apiUrl,
+  apiKey: Constants.expoConfig?.extra?.apiKey,
+};
+
+// app.config.js
+export default {
+  extra: {
+    apiUrl: process.env.API_URL,
+    apiKey: process.env.API_KEY,
+  },
+};
+```

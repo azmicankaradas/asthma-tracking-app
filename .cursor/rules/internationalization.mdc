@@ -1,0 +1,107 @@
+---
+globs: *.tsx,*.ts
+---
+
+# Internationalization (i18n) Guidelines
+
+## Setup
+
+- Use expo-localization for language detection
+- Implement proper translation structure
+- Handle RTL layouts
+
+```typescript
+import * as Localization from "expo-localization";
+import i18n from "i18n-js";
+
+i18n.translations = {
+  en: require("./translations/en.json"),
+  es: require("./translations/es.json"),
+};
+
+i18n.locale = Localization.locale;
+i18n.fallbacks = true;
+```
+
+## Translation Usage
+
+- Use translation keys
+- Handle pluralization
+- Support number formatting
+
+```typescript
+function TranslatedText({ count }) {
+  return (
+    <Text>
+      {i18n.t("items.count", {
+        count,
+        defaultValue: "{{count}} items",
+      })}
+    </Text>
+  );
+}
+```
+
+## RTL Support
+
+- Use proper flex direction
+- Handle text alignment
+- Support bidirectional text
+
+```typescript
+import { I18nManager } from "react-native";
+
+function RTLAwareView({ children }) {
+  return (
+    <View
+      style={{
+        flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+      }}
+    >
+      {children}
+    </View>
+  );
+}
+```
+
+## Date and Time
+
+- Use proper date formatting
+- Handle time zones
+- Support different calendar systems
+
+```typescript
+import { formatDate } from "./utils/date";
+
+function DateDisplay({ date }) {
+  return (
+    <Text>
+      {formatDate(date, {
+        locale: i18n.locale,
+        timeZone: Localization.timezone,
+      })}
+    </Text>
+  );
+}
+```
+
+## Accessibility
+
+- Support dynamic text sizes
+- Handle screen readers
+- Implement proper a11y labels
+
+```typescript
+function AccessibleText({ children }) {
+  return (
+    <Text
+      accessible={true}
+      adjustsFontSizeToFit={true}
+      allowFontScaling={true}
+      maxFontSizeMultiplier={2}
+    >
+      {children}
+    </Text>
+  );
+}
+```

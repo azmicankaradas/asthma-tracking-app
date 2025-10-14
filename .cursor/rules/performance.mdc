@@ -1,0 +1,112 @@
+---
+alwaysApply: true
+---
+
+# Performance Optimization Guidelines
+
+## Component Optimization
+
+- Memoize components when necessary
+- Use proper dependency arrays
+- Implement proper list rendering
+
+```typescript
+const MemoizedComponent = memo(
+  function Component({ data }) {
+    return <View>{/* render data */}</View>;
+  },
+  (prevProps, nextProps) => {
+    return prevProps.data === nextProps.data;
+  }
+);
+
+function VirtualizedList({ items }) {
+  const renderItem = useCallback(({ item }) => <ListItem item={item} />, []);
+
+  return (
+    <FlatList
+      data={items}
+      renderItem={renderItem}
+      keyExtractor={(item) => item.id}
+      windowSize={5}
+      maxToRenderPerBatch={10}
+      initialNumToRender={10}
+    />
+  );
+}
+```
+
+## Image Optimization
+
+- Use proper image formats
+- Implement lazy loading
+- Handle image caching
+
+```typescript
+import { Image } from "expo-image";
+
+function OptimizedImage({ uri }) {
+  return (
+    <Image
+      source={uri}
+      contentFit="cover"
+      transition={200}
+      cachePolicy="memory-disk"
+    />
+  );
+}
+```
+
+## Code Splitting
+
+- Use dynamic imports for large components
+- Implement proper lazy loading
+- Handle loading states
+
+```typescript
+const HeavyComponent = lazy(() => import("./HeavyComponent"));
+
+function App() {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <HeavyComponent />
+    </Suspense>
+  );
+}
+```
+
+## Startup Optimization
+
+- Use AppLoading properly
+- Implement SplashScreen correctly
+- Handle asset preloading
+
+```typescript
+import { SplashScreen } from "expo-router";
+
+function App() {
+  const [isReady] = useLoadAssets();
+
+  if (!isReady) {
+    return <SplashScreen />;
+  }
+
+  return <RootNavigation />;
+}
+```
+
+## Monitoring
+
+- Use performance monitoring tools
+- Track key metrics
+- Implement proper error tracking
+
+```typescript
+import * as Performance from "expo-performance";
+
+function trackPerformance() {
+  Performance.startMeasurement("key-interaction");
+  // ... perform operation
+  Performance.stopMeasurement("key-interaction");
+}
+```

@@ -1,0 +1,122 @@
+---
+alwaysApply: true
+---
+
+# State Management Guidelines
+
+## Local State
+
+- Use useState for simple component state
+- Implement useReducer for complex state logic
+- Avoid unnecessary state updates
+
+```typescript
+function useCounter(initialValue: number) {
+  const [state, dispatch] = useReducer(
+    (state: number, action: "increment" | "decrement") => {
+      switch (action) {
+        case "increment":
+          return state + 1;
+        case "decrement":
+          return state - 1;
+        default:
+          return state;
+      }
+    },
+    initialValue
+  );
+
+  return [state, dispatch] as const;
+}
+```
+
+## Global State
+
+- Use React Context for shared state
+- Implement proper context providers
+- Use Zustand for complex state management
+
+```typescript
+import create from "zustand";
+
+interface Store {
+  count: number;
+  increment: () => void;
+}
+
+const useStore = create<Store>((set) => ({
+  count: 0,
+  increment: () => set((state) => ({ count: state.count + 1 })),
+}));
+```
+
+## Data Fetching
+
+- Use react-query for API calls
+- Implement proper caching strategies
+- Handle loading and error states
+
+```typescript
+import { useQuery } from "@tanstack/react-query";
+
+function UserProfile({ userId }: { userId: string }) {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["user", userId],
+    queryFn: () => fetchUser(userId),
+  });
+
+  if (isLoading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage error={error} />;
+
+  return <ProfileView user={data} />;
+}
+```
+
+## URL State
+
+- Use URL parameters for shareable state
+- Handle URL updates properly
+- Sync URL state with app state
+
+```typescript
+import { useSearchParams } from "expo-router";
+
+function FilteredList() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const category = searchParams.get("category");
+
+  const updateCategory = (newCategory: string) => {
+    setSearchParams({ category: newCategory });
+  };
+
+  return (
+    <View>
+      <CategoryPicker value={category} onChange={updateCategory} />
+    </View>
+  );
+}
+```
+
+## Performance Optimization
+
+- Use useMemo for expensive computations
+- Implement useCallback for stable callbacks
+- Avoid unnecessary re-renders
+
+```typescript
+function ExpensiveComponent({ data }) {
+  const processedData = useMemo(() => {
+    return expensiveOperation(data);
+  }, [data]);
+
+  const handlePress = useCallback(() => {
+    // handle press
+  }, []);
+
+  return (
+    <Pressable onPress={handlePress}>
+      <Text>{processedData}</Text>
+    </Pressable>
+  );
+}
+```

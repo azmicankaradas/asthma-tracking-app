@@ -1,0 +1,113 @@
+---
+globs: *.test.ts,*.test.tsx,*.spec.ts,*.spec.tsx
+---
+
+# Testing Guidelines
+
+## Unit Testing
+
+- Use Jest and React Native Testing Library
+- Write meaningful test descriptions
+- Test component behavior, not implementation
+
+```typescript
+import { render, fireEvent } from "@testing-library/react-native";
+
+describe("Button", () => {
+  it("calls onPress when pressed", () => {
+    const onPress = jest.fn();
+    const { getByText } = render(<Button onPress={onPress}>Press Me</Button>);
+
+    fireEvent.press(getByText("Press Me"));
+    expect(onPress).toHaveBeenCalled();
+  });
+});
+```
+
+## Integration Testing
+
+- Test component interactions
+- Use proper test setup
+- Mock external dependencies
+
+```typescript
+import { renderHook } from "@testing-library/react-hooks";
+
+describe("useAuth", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("handles login flow", async () => {
+    const { result } = renderHook(() => useAuth());
+
+    await act(async () => {
+      await result.current.login(credentials);
+    });
+
+    expect(result.current.isAuthenticated).toBe(true);
+  });
+});
+```
+
+## E2E Testing
+
+- Use Detox for E2E tests
+- Test critical user flows
+- Handle async operations
+
+```typescript
+describe("App", () => {
+  beforeAll(async () => {
+    await device.launchApp();
+  });
+
+  beforeEach(async () => {
+    await device.reloadReactNative();
+  });
+
+  it("should show login screen", async () => {
+    await expect(element(by.id("login-screen"))).toBeVisible();
+  });
+});
+```
+
+## Snapshot Testing
+
+- Use snapshot tests for UI consistency
+- Update snapshots intentionally
+- Keep snapshots focused
+
+```typescript
+describe("Card", () => {
+  it("renders correctly", () => {
+    const tree = renderer.create(<Card title="Test" />).toJSON();
+    expect(tree).toMatchSnapshot();
+  });
+});
+```
+
+## Mocking
+
+- Mock external services
+- Use proper mock implementations
+- Reset mocks between tests
+
+```typescript
+jest.mock("api-service", () => ({
+  fetchData: jest.fn().mockResolvedValue({
+    data: "test",
+  }),
+}));
+
+describe("DataComponent", () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("fetches and displays data", async () => {
+    const { findByText } = render(<DataComponent />);
+    expect(await findByText("test")).toBeTruthy();
+  });
+});
+```

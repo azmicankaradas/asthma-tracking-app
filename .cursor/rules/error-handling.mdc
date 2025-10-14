@@ -1,0 +1,126 @@
+---
+globs: *.tsx,*.ts
+---
+
+# Error Handling Guidelines
+
+## Runtime Validation
+
+- Use Zod for data validation
+- Implement proper error boundaries
+- Handle edge cases properly
+
+```typescript
+import { z } from "zod";
+
+const UserSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1),
+  email: z.string().email(),
+});
+
+function validateUser(data: unknown) {
+  const result = UserSchema.safeParse(data);
+  if (!result.success) {
+    throw new ValidationError(result.error);
+  }
+  return result.data;
+}
+```
+
+## Error Boundaries
+
+- Implement proper error boundaries
+- Handle different types of errors
+- Provide fallback UI
+
+```typescript
+function ErrorBoundary({ children }) {
+  const [error, setError] = useState<Error | null>(null);
+
+  if (error) {
+    return <ErrorFallback error={error} />;
+  }
+
+  return (
+    <ErrorBoundary
+      onError={(error) => {
+        setError(error);
+        reportError(error);
+      }}
+    >
+      {children}
+    </ErrorBoundary>
+  );
+}
+```
+
+## Error Logging
+
+- Use proper error logging service
+- Track error metrics
+- Implement proper error reporting
+
+```typescript
+import * as Sentry from "sentry-expo";
+
+function reportError(error: Error) {
+  Sentry.Native.captureException(error);
+
+  if (__DEV__) {
+    console.error(error);
+  }
+}
+```
+
+## API Error Handling
+
+- Handle network errors properly
+- Implement proper retry logic
+- Show appropriate error messages
+
+```typescript
+async function fetchWithRetry<T>(
+  url: string,
+  options: RequestInit = {},
+  retries = 3
+): Promise<T> {
+  try {
+    const response = await fetch(url, options);
+    if (!response.ok) {
+      throw new ApiError(response.statusText);
+    }
+    return response.json();
+  } catch (error) {
+    if (retries > 0) {
+      await delay(1000);
+      return fetchWithRetry(url, options, retries - 1);
+    }
+    throw error;
+  }
+}
+```
+
+## Form Validation
+
+- Use proper form validation
+- Show clear error messages
+- Handle submission errors
+
+```typescript
+function LoginForm() {
+  const { register, handleSubmit, errors } = useForm({
+    resolver: zodResolver(LoginSchema),
+  });
+
+  const onSubmit = async (data) => {
+    try {
+      await login(data);
+    } catch (error) {
+      showErrorToast(error.message);
+    }
+  };
+
+  return <Form onSubmit={handleSubmit(onSubmit)}>{/* form fields */}</Form>;
+}
+```

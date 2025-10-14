@@ -1,0 +1,104 @@
+---
+alwaysApply: true
+---
+
+# TypeScript Usage Guidelines
+
+## Type Definitions
+
+- Use interfaces over types for object definitions
+- Avoid enums; use const objects with `as const` instead
+
+```typescript
+// Good
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+// Good - instead of enum
+const UserRole = {
+  ADMIN: "admin",
+  USER: "user",
+  GUEST: "guest",
+} as const;
+type UserRole = (typeof UserRole)[keyof typeof UserRole];
+
+// Bad
+enum UserRole {
+  ADMIN = "admin",
+  USER = "user",
+  GUEST = "guest",
+}
+```
+
+## Component Props
+
+- Define prop interfaces with clear, descriptive names
+- Use optional properties sparingly
+
+```typescript
+interface CardProps {
+  title: string;
+  description: string;
+  onPress: () => void;
+  imageUrl?: string; // Optional props should have a good reason to be optional
+}
+```
+
+## Type Assertions
+
+- Avoid type assertions (`as`) when possible
+- Use type guards and narrowing instead
+
+```typescript
+// Good
+function isError(error: unknown): error is Error {
+  return error instanceof Error;
+}
+
+// Bad
+const error = someValue as Error;
+```
+
+## Generics
+
+- Use generics for reusable components and utilities
+- Provide clear, descriptive type parameters
+
+```typescript
+function createResource<T>(url: string): Promise<T> {
+  return fetch(url).then((res) => res.json());
+}
+```
+
+## Strict Mode
+
+- Enable strict mode in tsconfig.json
+- Use strict null checks
+- Enable all recommended TypeScript compiler options
+
+```json
+{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true
+  }
+}
+```
+
+## Type Imports/Exports
+
+- Use type imports for types only
+- Export types and interfaces separately from values
+
+```typescript
+import type { User } from "./types";
+export interface Config {
+  /* ... */
+}
+export type Theme = "light" | "dark";
+```

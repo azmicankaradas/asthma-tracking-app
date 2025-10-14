@@ -1,0 +1,101 @@
+---
+globs: *.tsx
+---
+
+# Safe Area Management Guidelines
+
+## Provider Setup
+
+- Use SafeAreaProvider at the root of your app
+- Configure safe area context properly
+
+```typescript
+import { SafeAreaProvider } from "react-native-safe-area-context";
+
+function App() {
+  return (
+    <SafeAreaProvider>
+      <Navigation />
+    </SafeAreaProvider>
+  );
+}
+```
+
+## Safe Area Components
+
+- Use SafeAreaView for screens
+- Use useSafeAreaInsets for custom layouts
+- Implement proper handling for notches and system bars
+
+```typescript
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
+
+function Screen() {
+  const insets = useSafeAreaInsets();
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <View
+        style={{
+          paddingTop: insets.top,
+          paddingBottom: insets.bottom,
+        }}
+      >
+        {/* content */}
+      </View>
+    </SafeAreaView>
+  );
+}
+```
+
+## Scrollable Content
+
+- Use SafeAreaScrollView for scrollable content
+- Handle keyboard avoidance properly
+
+```typescript
+function ScrollableScreen() {
+  return (
+    <SafeAreaView style={styles.container}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <ScrollView
+          contentContainerStyle={{
+            flexGrow: 1,
+            paddingBottom: insets.bottom,
+          }}
+        >
+          {/* scrollable content */}
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
+}
+```
+
+## Edge Cases
+
+- Handle landscape mode properly
+- Account for different device sizes
+- Support split screen on tablets
+
+```typescript
+function AdaptiveLayout() {
+  const insets = useSafeAreaInsets();
+  const { width, height } = useWindowDimensions();
+
+  const isLandscape = width > height;
+
+  return (
+    <SafeAreaView
+      style={[styles.container, isLandscape && styles.landscapeContainer]}
+    >
+      {/* content */}
+    </SafeAreaView>
+  );
+}
+```

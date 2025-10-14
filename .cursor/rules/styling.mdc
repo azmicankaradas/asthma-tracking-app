@@ -1,0 +1,116 @@
+---
+alwaysApply: true
+---
+
+# UI and Styling Guidelines
+
+## Component Styling
+
+- Use styled-components or Tailwind CSS for component styling
+- Implement responsive design using Flexbox
+- Use Expo's useWindowDimensions for responsive layouts
+
+```typescript
+import { useWindowDimensions } from "react-native";
+
+function ResponsiveCard() {
+  const { width } = useWindowDimensions();
+  const cardWidth = width < 768 ? "100%" : "50%";
+
+  return <View style={{ width: cardWidth }}>{/* card content */}</View>;
+}
+```
+
+## Theme Support
+
+- Use theme context for consistent styling
+- Support dark mode using useColorScheme
+- Define theme tokens in a central location
+
+```typescript
+import { useColorScheme } from "react-native";
+
+function useThemeColor(
+  props: { light?: string; dark?: string },
+  colorName: keyof typeof Colors.light & keyof typeof Colors.dark
+) {
+  const theme = useColorScheme() ?? "light";
+  const colorFromProps = props[theme];
+
+  if (colorFromProps) {
+    return colorFromProps;
+  }
+  return Colors[theme][colorName];
+}
+```
+
+## Layout Guidelines
+
+- Use Flexbox for layouts
+- Implement proper spacing using theme tokens
+- Handle safe areas appropriately
+
+```typescript
+import { SafeAreaView } from "react-native-safe-area-context";
+
+function Screen({ children }) {
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.content}>{children}</View>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  content: {
+    padding: 16,
+  },
+});
+```
+
+## Accessibility
+
+- Use semantic HTML elements and ARIA roles
+- Support dynamic text sizes
+- Ensure proper color contrast
+- Implement proper touch targets
+
+```typescript
+function AccessibleButton({ onPress, label }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      accessible={true}
+      accessibilityLabel={label}
+      accessibilityRole="button"
+      style={styles.button}
+    >
+      <Text>{label}</Text>
+    </Pressable>
+  );
+}
+```
+
+## Animations
+
+- Use react-native-reanimated for performant animations
+- Implement gesture handling with react-native-gesture-handler
+- Keep animations smooth and purposeful
+
+```typescript
+import Animated, {
+  withSpring,
+  useAnimatedStyle,
+} from "react-native-reanimated";
+
+function AnimatedCard() {
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: withSpring(1.1) }],
+  }));
+
+  return <Animated.View style={animatedStyle} />;
+}
+```

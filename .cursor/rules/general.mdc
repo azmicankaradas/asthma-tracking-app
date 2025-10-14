@@ -1,0 +1,85 @@
+---
+alwaysApply: true
+---
+
+# General Code Style and Structure
+
+## Project Structure
+
+- Main components should be in the `app` directory using the Expo Router file-based routing
+- Reusable components belong in the `components` directory
+- Hooks should be in the `hooks` directory
+- Constants and theme configurations in `constants`
+- Assets (images, fonts) in `assets`
+
+## Code Organization
+
+- Structure files in this order:
+  1. Exports and interfaces
+  2. Main component
+  3. Subcomponents
+  4. Helper functions
+  5. Static content
+  6. Types/interfaces
+
+## Naming Conventions
+
+- Use lowercase with dashes for directories (e.g., `components/auth-wizard`)
+- Use PascalCase for component files and functions
+- Use camelCase for variables and non-component functions
+- Prefix boolean variables with auxiliary verbs (e.g., `isLoading`, `hasError`)
+
+## Function Declarations
+
+- Use the "function" keyword for pure functions
+- Use arrow functions for callbacks and methods
+
+```typescript
+// Good
+function calculateTotal(items: Item[]): number {
+  return items.reduce((sum, item) => sum + item.price, 0);
+}
+
+// Good - callback
+const handlePress = () => {
+  // handler logic
+};
+```
+
+## Component Structure
+
+- Use functional components with TypeScript interfaces
+- Export components as named exports
+
+```typescript
+interface ButtonProps {
+  label: string;
+  onPress: () => void;
+}
+
+export function Button({ label, onPress }: ButtonProps) {
+  return (
+    <Pressable onPress={onPress}>
+      <Text>{label}</Text>
+    </Pressable>
+  );
+}
+```
+
+## Code Style
+
+- Use Prettier for consistent formatting
+- Avoid unnecessary curly braces in simple conditionals
+- Use declarative JSX patterns
+- Prefer iteration over repetition
+
+```typescript
+// Good
+{items.map(item => (
+  <ListItem key={item.id} {...item} />
+))}
+
+// Bad
+<ListItem {...items[0]} />
+<ListItem {...items[1]} />
+```
